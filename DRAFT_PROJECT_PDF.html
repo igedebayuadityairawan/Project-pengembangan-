@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Draft Project — Sistem Absensi Otomatis Berbasis IoT (ESP32 + RFID RC522)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 11pt;
+    line-height: 1.7;
+    color: #1e293b;
+    background: white;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 20mm 18mm;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 85vh;
+    text-align: center;
+    page-break-after: always;
+    border: 3px solid #1e40af;
+    border-radius: 8px;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-page::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #1e40af, #7c3aed, #1e40af);
+  }
+
+  .cover-page::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #1e40af, #7c3aed, #1e40af);
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 10pt;
+    font-weight: 700;
+    padding: 8px 24px;
+    border-radius: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    border: 1px solid #c7d2fe;
+  }
+
+  .cover-title {
+    font-size: 24pt;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .cover-subtitle {
+    font-size: 13pt;
+    font-weight: 600;
+    color: #3b82f6;
+    margin-bottom: 6px;
+  }
+
+  .cover-tech {
+    font-size: 10pt;
+    color: #64748b;
+    margin-bottom: 40px;
+  }
+
+  .cover-divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #7c3aed);
+    margin: 30px auto;
+    border-radius: 2px;
+  }
+
+  .cover-meta {
+    font-size: 10pt;
+    color: #475569;
+    line-height: 2;
+  }
+
+  .cover-meta strong {
+    color: #0f172a;
+  }
+
+  /* ===== HEADINGS ===== */
+  h1 {
+    font-size: 20pt;
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 6px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #3b82f6;
+  }
+
+  h2 {
+    font-size: 14pt;
+    font-weight: 800;
+    color: #1e40af;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    padding-left: 14px;
+    border-left: 4px solid #3b82f6;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  h4 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #374151;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* ===== PARAGRAPHS ===== */
+  p {
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 9.5pt;
+  }
+
+  table th {
+    background: #1e40af;
+    color: white;
+    font-weight: 700;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+
+  table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  table tr:hover td {
+    background: #eef2ff;
+  }
+
+  table code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    color: #7c3aed;
+  }
+
+  /* ===== LISTS ===== */
+  ul, ol {
+    margin: 8px 0 14px 22px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* ===== HIGHLIGHT BOXES ===== */
+  .info-box {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 14px 18px;
+    margin: 14px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 10pt;
+  }
+
+  .info-box strong {
+    color: #1e40af;
+  }
+
+  .warning-box {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 14px 18px;
+    margin: 14px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 10pt;
+  }
+
+  .success-box {
+    background: #ecfdf5;
+    border-left: 4px solid #22c55e;
+    padding: 14px 18px;
+    margin: 14px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 10pt;
+  }
+
+  /* ===== CODE BLOCKS ===== */
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.6;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+  }
+
+  .inline-code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #7c3aed;
+    font-size: 9pt;
+  }
+
+  /* ===== DIAGRAM IMAGE ===== */
+  .diagram-container {
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .diagram-container img {
+    max-width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .diagram-caption {
+    font-size: 9pt;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ===== FLOW DIAGRAM WITH CSS ===== */
+  .flow-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 18px 0;
+  }
+
+  .flow-step {
+    background: #1e40af;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 9pt;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .flow-step.sensor { background: #059669; }
+  .flow-step.process { background: #7c3aed; }
+  .flow-step.network { background: #dc2626; }
+  .flow-step.server { background: #ea580c; }
+  .flow-step.output { background: #0284c7; }
+
+  .flow-arrow {
+    font-size: 16pt;
+    color: #94a3b8;
+    font-weight: bold;
+  }
+
+  /* ===== PAGE BREAK ===== */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* ===== SECTION NUMBER ===== */
+  .section-num {
+    display: inline-block;
+    background: #1e40af;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 12pt;
+    font-weight: 800;
+    margin-right: 8px;
+  }
+
+  /* ===== LAYER BOX ===== */
+  .layer-box {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    position: relative;
+  }
+
+  .layer-box .layer-title {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: white;
+    padding: 0 10px;
+    font-size: 10pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .layer-box.perception { border-color: #22c55e; }
+  .layer-box.perception .layer-title { color: #16a34a; }
+
+  .layer-box.network-layer { border-color: #3b82f6; }
+  .layer-box.network-layer .layer-title { color: #2563eb; }
+
+  .layer-box.application { border-color: #a855f7; }
+  .layer-box.application .layer-title { color: #7c3aed; }
+
+  /* ===== FOOTER ===== */
+  .doc-footer {
+    text-align: center;
+    font-size: 8.5pt;
+    color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+    margin-top: 40px;
+  }
+
+  /* ===== PIN TABLE SPECIAL ===== */
+  .pin-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: #7c3aed;
+  }
+
+  /* ===== TWO COLUMN ===== */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media print {
+    body { padding: 0; }
+    .cover-page { min-height: 90vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover-page">
+  <div class="cover-badge">📋 Draft Project</div>
+  <div class="cover-title">Sistem Absensi Otomatis<br>Berbasis IoT</div>
+  <div class="cover-subtitle">ESP32 + RFID RC522 + MySQL</div>
+  <div class="cover-tech">Wireless Sensor Network (WSN) • Internet of Things</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <strong>Teknologi:</strong> ESP32, MFRC522, LCD I2C, PHP, MySQL, XAMPP<br>
+    <strong>Protokol:</strong> SPI, I2C, HTTP, WiFi 802.11 b/g/n<br>
+    <strong>Tanggal:</strong> 31 Maret 2026<br>
+  </div>
+</div>
+
+<!-- ==================== DAFTAR ISI ==================== -->
+<h1>Daftar Isi</h1>
+<table>
+  <tr><td><strong>1.</strong></td><td>Latar Belakang & Konsep Project</td></tr>
+  <tr><td><strong>2.</strong></td><td>Tujuan Sistem</td></tr>
+  <tr><td><strong>3.</strong></td><td>Arsitektur IoT (3 Layer)</td></tr>
+  <tr><td><strong>4.</strong></td><td>Hardware yang Diperlukan</td></tr>
+  <tr><td><strong>5.</strong></td><td>Software yang Diperlukan</td></tr>
+  <tr><td><strong>6.</strong></td><td>Wiring Diagram (Rangkaian Pin)</td></tr>
+  <tr><td><strong>7.</strong></td><td>Skema Database MySQL</td></tr>
+  <tr><td><strong>8.</strong></td><td>Alur Kerja Sistem (System Flow)</td></tr>
+  <tr><td><strong>9.</strong></td><td>Fitur Web Dashboard</td></tr>
+  <tr><td><strong>10.</strong></td><td>Logika Sesi Absensi</td></tr>
+  <tr><td><strong>11.</strong></td><td>Struktur File Project</td></tr>
+  <tr><td><strong>12.</strong></td><td>Kesimpulan</td></tr>
+</table>
+
+<!-- ==================== BAB 1 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">1</span> Latar Belakang & Konsep Project</h1>
+
+<p>
+Sistem absensi konvensional yang masih menggunakan tanda tangan manual pada kertas memiliki banyak kelemahan, antara lain: potensi kecurangan (titip absen), proses rekap data yang memakan waktu, serta sulitnya mendapatkan data secara <em>real-time</em>. Sistem ini dirancang sebagai solusi modern menggunakan pendekatan <strong>Internet of Things (IoT)</strong> dan konsep <strong>Wireless Sensor Network (WSN)</strong>.
+</p>
+
+<p>
+Project ini merupakan <strong>Sistem Absensi Otomatis Berbasis IoT</strong> yang menggunakan mikrokontroler <strong>ESP32</strong> sebagai <em>Sensor Node</em>, modul <strong>RFID RC522</strong> sebagai pembaca kartu identitas, dan <strong>MySQL</strong> sebagai database penyimpanan data absensi. Sistem mampu mengirim data secara wireless melalui WiFi ke server lokal (XAMPP) dan menampilkan hasilnya pada <strong>Web Dashboard</strong> secara <em>real-time</em>.
+</p>
+
+<div class="info-box">
+  <strong>💡 Konsep Inti:</strong> Setiap pengguna memiliki kartu RFID dengan UID unik. Saat kartu di-<em>tap</em> pada reader, ESP32 membaca UID tersebut dan mengirimnya ke server PHP via HTTP POST. Server mencatat absensi ke database MySQL beserta informasi sesi (Pagi/Siang/Sore/Malam) secara otomatis berdasarkan waktu.
+</div>
+
+<!-- ==================== BAB 2 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">2</span> Tujuan Sistem</h1>
+
+<ol>
+  <li>Membangun sistem absensi yang <strong>otomatis</strong>, <strong>efisien</strong>, dan <strong>tidak dapat dipalsukan</strong> menggunakan RFID.</li>
+  <li>Menerapkan konsep <strong>Wireless Sensor Network (WSN)</strong> dimana ESP32 berperan sebagai <em>Sensor Node</em> dan server sebagai <em>Sink Node / Gateway</em>.</li>
+  <li>Menyediakan <strong>Web Dashboard</strong> berbasis PHP untuk monitoring absensi secara <em>real-time</em> dengan fitur notifikasi, statistik, dan manajemen data pengguna.</li>
+  <li>Memberikan <strong>feedback interaktif</strong> kepada pengguna melalui LCD I2C (visual) dan Buzzer (audio) langsung pada perangkat.</li>
+  <li>Menerapkan klasifikasi <strong>sesi absensi otomatis</strong> berdasarkan waktu (Pagi, Siang, Sore, Malam) menggunakan sinkronisasi NTP.</li>
+</ol>
+
+<!-- ==================== BAB 3 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">3</span> Arsitektur IoT (3 Layer)</h1>
+
+<p>
+Sistem ini menggunakan arsitektur IoT standar 3 layer yang umum digunakan pada implementasi Wireless Sensor Network:
+</p>
+
+<div class="layer-box perception">
+  <div class="layer-title">🔌 Layer 1 — Perception Layer (Sensor Node)</div>
+  <p style="margin-top: 8px;">
+    Layer paling bawah yang bertugas mengumpulkan data dari dunia fisik. Pada sistem ini terdiri dari:
+  </p>
+  <ul>
+    <li><strong>ESP32 DevKit V1</strong> — Mikrokontroler utama (Sensor Node) dengan WiFi built-in</li>
+    <li><strong>MFRC522 RFID Reader</strong> — Membaca UID kartu RFID 13.56 MHz via protokol SPI</li>
+    <li><strong>LCD I2C 16x2</strong> — Menampilkan informasi status, waktu, dan feedback ke pengguna via protokol I2C</li>
+    <li><strong>Active Buzzer</strong> — Feedback audio (beep sukses/gagal) via PWM pada GPIO4</li>
+  </ul>
+</div>
+
+<div class="layer-box network-layer">
+  <div class="layer-title">📡 Layer 2 — Network Layer (Komunikasi)</div>
+  <p style="margin-top: 8px;">
+    Layer tengah yang mengatur transmisi data dari Sensor Node ke Server:
+  </p>
+  <ul>
+    <li><strong>WiFi 802.11 b/g/n</strong> — Koneksi wireless ESP32 ke jaringan lokal (Access Point)</li>
+    <li><strong>HTTP POST</strong> — Protokol pengiriman data UID dari ESP32 ke PHP API endpoint</li>
+    <li><strong>NTP (Network Time Protocol)</strong> — Sinkronisasi waktu ESP32 dengan server <code>pool.ntp.org</code></li>
+    <li><strong>JSON / Plain Text</strong> — Format respon data antara server dan client (web dashboard)</li>
+  </ul>
+</div>
+
+<div class="layer-box application">
+  <div class="layer-title">🖥️ Layer 3 — Application Layer (Server & Dashboard)</div>
+  <p style="margin-top: 8px;">
+    Layer teratas yang memproses, menyimpan, dan menampilkan data:
+  </p>
+  <ul>
+    <li><strong>Apache Web Server (XAMPP)</strong> — Menjalankan backend PHP dan menyajikan halaman web</li>
+    <li><strong>PHP Backend API</strong> — Memproses data UID, menentukan sesi, menyimpan ke database (berperan sebagai <em>Sink Node / Gateway</em>)</li>
+    <li><strong>MySQL Database</strong> — Menyimpan data pengguna RFID dan log absensi (berperan sebagai <em>Cloud Database</em>)</li>
+    <li><strong>Web Dashboard</strong> — Interface monitoring real-time dengan statistik, notifikasi, dan manajemen user</li>
+  </ul>
+</div>
+
+<h3>Diagram Alur Data</h3>
+<div class="flow-diagram">
+  <div class="flow-step sensor">🔖 Kartu RFID</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step sensor">📡 RC522 Reader</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step process">⚙️ ESP32 (SPI)</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step network">📶 WiFi HTTP POST</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step server">🌐 PHP API</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step output">🗄️ MySQL DB</div>
+</div>
+
+<div class="flow-diagram">
+  <div class="flow-step output">🗄️ MySQL DB</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step server">🌐 PHP Backend</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step output">💻 Web Dashboard</div>
+  <div class="flow-arrow">←→</div>
+  <div class="flow-step process">📊 Real-time Monitoring</div>
+</div>
+
+<!-- ==================== BAB 4 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">4</span> Hardware yang Diperlukan</h1>
+
+<table>
+  <tr>
+    <th>No</th>
+    <th>Komponen</th>
+    <th>Spesifikasi</th>
+    <th>Jumlah</th>
+    <th>Fungsi</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td><strong>ESP32 DevKit V1</strong></td>
+    <td>Dual-core, WiFi + BLE, 38 pin</td>
+    <td>1 buah</td>
+    <td>Mikrokontroler utama (Sensor Node)</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><strong>MFRC522 RFID Reader</strong></td>
+    <td>13.56 MHz, SPI interface</td>
+    <td>1 buah</td>
+    <td>Membaca UID kartu RFID</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><strong>Kartu RFID / Keychain</strong></td>
+    <td>Mifare Classic 1K, 13.56 MHz</td>
+    <td>≥ 2 buah</td>
+    <td>Identitas unik pengguna</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><strong>LCD I2C 16x2</strong></td>
+    <td>HD44780 + PCF8574 I2C backpack</td>
+    <td>1 buah</td>
+    <td>Display status & feedback visual</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><strong>Active Buzzer</strong></td>
+    <td>5V, frekuensi ~2700 Hz</td>
+    <td>1 buah</td>
+    <td>Feedback audio sukses/gagal</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><strong>Breadboard</strong></td>
+    <td>830 titik lubang (full-size)</td>
+    <td>1 buah</td>
+    <td>Media prototyping tanpa solder</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td><strong>Kabel Jumper</strong></td>
+    <td>Male-Male & Male-Female</td>
+    <td>±20 buah</td>
+    <td>Koneksi antar komponen</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td><strong>Kabel Micro USB</strong></td>
+    <td>Data + Power supply</td>
+    <td>1 buah</td>
+    <td>Upload program & power ESP32</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td><strong>Laptop / PC</strong></td>
+    <td>Windows / Linux / macOS</td>
+    <td>1 buah</td>
+    <td>Programming & menjalankan server</td>
+  </tr>
+</table>
+
+<!-- ==================== BAB 5 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">5</span> Software yang Diperlukan</h1>
+
+<table>
+  <tr>
+    <th>No</th>
+    <th>Software</th>
+    <th>Versi</th>
+    <th>Fungsi</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td><strong>Arduino IDE</strong></td>
+    <td>2.x / 1.8.x</td>
+    <td>IDE untuk menulis & upload firmware ESP32</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><strong>ESP32 Board Package</strong></td>
+    <td>Arduino Core 3.x</td>
+    <td>Board support ESP32 di Arduino IDE</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><strong>XAMPP</strong></td>
+    <td>8.x (PHP 8.x + MySQL)</td>
+    <td>Paket server lokal (Apache + PHP + MySQL)</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><strong>Web Browser</strong></td>
+    <td>Chrome / Edge / Firefox</td>
+    <td>Akses web dashboard untuk monitoring</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><strong>phpMyAdmin</strong></td>
+    <td>(Sudah termasuk XAMPP)</td>
+    <td>Manajemen database MySQL via GUI</td>
+  </tr>
+</table>
+
+<h3>Library Arduino yang Diperlukan</h3>
+<table>
+  <tr>
+    <th>Library</th>
+    <th>Fungsi</th>
+    <th>Protokol</th>
+  </tr>
+  <tr>
+    <td><code>WiFi.h</code></td>
+    <td>Koneksi ESP32 ke jaringan WiFi</td>
+    <td>WiFi 802.11</td>
+  </tr>
+  <tr>
+    <td><code>HTTPClient.h</code></td>
+    <td>Mengirim HTTP POST request ke server PHP</td>
+    <td>HTTP</td>
+  </tr>
+  <tr>
+    <td><code>SPI.h</code></td>
+    <td>Protokol komunikasi SPI untuk RFID reader</td>
+    <td>SPI</td>
+  </tr>
+  <tr>
+    <td><code>MFRC522.h</code></td>
+    <td>Driver modul RFID RC522</td>
+    <td>SPI</td>
+  </tr>
+  <tr>
+    <td><code>Wire.h</code></td>
+    <td>Protokol komunikasi I2C untuk LCD</td>
+    <td>I2C</td>
+  </tr>
+  <tr>
+    <td><code>LiquidCrystal_I2C.h</code></td>
+    <td>Driver LCD 16x2 via I2C backpack</td>
+    <td>I2C</td>
+  </tr>
+  <tr>
+    <td><code>time.h</code></td>
+    <td>Sinkronisasi waktu via NTP</td>
+    <td>NTP</td>
+  </tr>
+</table>
+
+<!-- ==================== BAB 6 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">6</span> Wiring Diagram (Rangkaian Pin)</h1>
+
+<h3>6.1 Koneksi RFID RC522 → ESP32 (SPI)</h3>
+<table class="pin-table">
+  <tr>
+    <th>Pin RFID RC522</th>
+    <th>Pin ESP32</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td>SDA (SS)</td><td>GPIO 5</td><td>Chip Select (Slave Select)</td></tr>
+  <tr><td>SCK</td><td>GPIO 18</td><td>Serial Clock</td></tr>
+  <tr><td>MOSI</td><td>GPIO 23</td><td>Master Out Slave In</td></tr>
+  <tr><td>MISO</td><td>GPIO 19</td><td>Master In Slave Out</td></tr>
+  <tr><td>RST</td><td>GPIO 27</td><td>Reset (pindah dari GPIO 22 karena I2C)</td></tr>
+  <tr><td>3.3V</td><td>3.3V</td><td>Power supply (PENTING: hanya 3.3V!)</td></tr>
+  <tr><td>GND</td><td>GND</td><td>Ground</td></tr>
+</table>
+
+<h3>6.2 Koneksi LCD I2C 16x2 → ESP32 (I2C)</h3>
+<table class="pin-table">
+  <tr>
+    <th>Pin LCD I2C</th>
+    <th>Pin ESP32</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td>SDA</td><td>GPIO 21</td><td>I2C Data (default ESP32)</td></tr>
+  <tr><td>SCL</td><td>GPIO 22</td><td>I2C Clock (default ESP32)</td></tr>
+  <tr><td>VCC</td><td>VIN (5V)</td><td>Power supply via USB 5V</td></tr>
+  <tr><td>GND</td><td>GND</td><td>Ground</td></tr>
+</table>
+
+<h3>6.3 Koneksi Buzzer → ESP32</h3>
+<table class="pin-table">
+  <tr>
+    <th>Pin Buzzer</th>
+    <th>Pin ESP32</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td>Positif (+)</td><td>GPIO 4</td><td>PWM output (2700 Hz, 8-bit resolution)</td></tr>
+  <tr><td>Negatif (–)</td><td>GND</td><td>Ground</td></tr>
+</table>
+
+<div class="warning-box">
+  <strong>⚠️ PENTING:</strong> Modul RFID RC522 hanya boleh diberi tegangan <strong>3.3V</strong>. Menghubungkan ke 5V dapat merusak modul secara permanen! Pin RST RFID dipindah ke GPIO 27 karena GPIO 22 sudah digunakan untuk I2C SCL.
+</div>
+
+<!-- ==================== BAB 7 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">7</span> Skema Database MySQL</h1>
+
+<p>Database <span class="inline-code">nodemcu_rfidrc522_mysql</span> terdiri dari 3 tabel utama:</p>
+
+<h3>7.1 Tabel <code>table_nodemcu_rfidrc522_mysql</code> — Data User</h3>
+<table>
+  <tr>
+    <th>Kolom</th>
+    <th>Tipe</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td><code>id</code></td><td>VARCHAR(8) PK</td><td>UID kartu RFID (8 digit hex, misal: <code>A3B4C5D6</code>)</td></tr>
+  <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>Nama lengkap pengguna</td></tr>
+  <tr><td><code>gender</code></td><td>VARCHAR(10)</td><td>Jenis kelamin (Male/Female)</td></tr>
+  <tr><td><code>email</code></td><td>VARCHAR(100)</td><td>Alamat email</td></tr>
+  <tr><td><code>mobile</code></td><td>VARCHAR(20)</td><td>Nomor telepon/HP</td></tr>
+</table>
+
+<h3>7.2 Tabel <code>log_absensi</code> — Log Absensi</h3>
+<table>
+  <tr>
+    <th>Kolom</th>
+    <th>Tipe</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td><code>id</code></td><td>INT AUTO_INCREMENT PK</td><td>Primary key otomatis</td></tr>
+  <tr><td><code>uid</code></td><td>VARCHAR(8)</td><td>UID kartu RFID yang di-tap</td></tr>
+  <tr><td><code>waktu</code></td><td>DATETIME</td><td>Timestamp saat tap kartu</td></tr>
+  <tr><td><code>sesi</code></td><td>VARCHAR(10)</td><td>Sesi otomatis: Pagi/Siang/Sore/Malam</td></tr>
+</table>
+
+<h3>7.3 Tabel <code>node_control</code> — Kontrol Node ESP32</h3>
+<table>
+  <tr>
+    <th>Kolom</th>
+    <th>Tipe</th>
+    <th>Keterangan</th>
+  </tr>
+  <tr><td><code>id</code></td><td>INT PK</td><td>Fixed ID = 1</td></tr>
+  <tr><td><code>sleep_mode</code></td><td>TINYINT(1)</td><td>0 = Active, 1 = Sleep Mode</td></tr>
+</table>
+
+<!-- ==================== BAB 8 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">8</span> Alur Kerja Sistem (System Flow)</h1>
+
+<h3>8.1 Proses Booting ESP32</h3>
+<ol>
+  <li>ESP32 dinyalakan → Inisialisasi LCD, SPI, RFID Reader</li>
+  <li>LCD menampilkan <em>"Connecting WiFi"</em> → ESP32 terhubung ke Access Point</li>
+  <li>LCD menampilkan IP Address yang didapat → Buzzer beep sukses</li>
+  <li>Sinkronisasi waktu NTP (<code>pool.ntp.org</code>, UTC+8 WITA)</li>
+  <li>LCD menampilkan <em>"RFID ABSENSI"</em> + jam + sesi → Siap digunakan</li>
+</ol>
+
+<h3>8.2 Proses Tap Kartu RFID</h3>
+<ol>
+  <li>Pengguna mendekatkan kartu RFID ke reader RC522</li>
+  <li>ESP32 membaca UID kartu (4 byte → 8 hex) via SPI</li>
+  <li>Buzzer beep pendek sebagai konfirmasi baca</li>
+  <li>LCD menampilkan <em>"UID: XXXXXXXX — Mengirim data..."</em></li>
+  <li>ESP32 mengirim HTTP POST ke <code>getUID.php</code> dengan parameter:
+    <ul>
+      <li><span class="inline-code">apikey</span> = kunci API untuk validasi</li>
+      <li><span class="inline-code">UIDresult</span> = UID kartu yang dibaca</li>
+    </ul>
+  </li>
+  <li>Server PHP memproses:
+    <ul>
+      <li>Validasi API Key</li>
+      <li>Menentukan sesi berdasarkan jam server</li>
+      <li>Menyimpan log absensi ke database MySQL</li>
+      <li>Mencari nama pengguna berdasarkan UID</li>
+      <li>Mengirim respon: <span class="inline-code">OK|NamaMahasiswa|Sesi</span></li>
+    </ul>
+  </li>
+  <li>ESP32 menerima respon → Parse data nama & sesi</li>
+  <li>LCD menampilkan greeting + nama pengguna (2 detik)</li>
+  <li>LCD menampilkan info absensi sesi + UID (2 detik)</li>
+  <li>Kembali ke layar utama (idle)</li>
+</ol>
+
+<div class="success-box">
+  <strong>✅ Respon Server:</strong> Format <code>OK|NamaMahasiswa|Sesi</code> — contoh: <code>OK|I Gede Surya|Pagi</code>
+</div>
+
+<h3>8.3 Kondisi Error</h3>
+<table>
+  <tr><th>Kondisi</th><th>Respon ESP32</th><th>LCD Display</th><th>Buzzer</th></tr>
+  <tr><td>UID belum terdaftar</td><td>Response contain "UNKNOWN"</td><td>❌ Blm Terdaftar</td><td>3× beep pendek</td></tr>
+  <tr><td>Server error / timeout</td><td>HTTP code ≠ 200</td><td>❌ TAP GAGAL! Server Error</td><td>3× beep pendek</td></tr>
+  <tr><td>WiFi putus</td><td>WL_DISCONNECTED</td><td>❌ WiFi PUTUS!</td><td>1× beep panjang (700ms)</td></tr>
+</table>
+
+<!-- ==================== BAB 9 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">9</span> Fitur Web Dashboard</h1>
+
+<p>Web dashboard dibangun menggunakan PHP native dengan desain modern dark theme dan responsif. Terdapat 4 halaman utama:</p>
+
+<table>
+  <tr>
+    <th>Halaman</th>
+    <th>File</th>
+    <th>Fitur</th>
+  </tr>
+  <tr>
+    <td>🏠 <strong>Home / Dashboard</strong></td>
+    <td><code>home.php</code></td>
+    <td>
+      • Live clock (jam digital real-time)<br>
+      • Statistik absensi hari ini (Total, Pagi, Siang, Sore/Malam)<br>
+      • 5 tap terakhir dalam tabel<br>
+      • Kontrol node ESP32 (Sleep/Wake)<br>
+      • Notifikasi toast real-time + sound effect
+    </td>
+  </tr>
+  <tr>
+    <td>📋 <strong>User Data</strong></td>
+    <td><code>user data.php</code></td>
+    <td>
+      • Tabel semua pengguna terdaftar<br>
+      • Edit & Delete data pengguna<br>
+      • Pencarian berdasarkan nama/UID
+    </td>
+  </tr>
+  <tr>
+    <td>📝 <strong>Registration</strong></td>
+    <td><code>registration.php</code></td>
+    <td>
+      • Form registrasi pengguna baru<br>
+      • Auto-fill UID dari tap kartu RFID<br>
+      • Validasi duplikat UID
+    </td>
+  </tr>
+  <tr>
+    <td>📡 <strong>Read Tag</strong></td>
+    <td><code>read tag.php</code></td>
+    <td>
+      • Log absensi lengkap dengan filter<br>
+      • Tampilan data per sesi<br>
+      • Riwayat tap kartu
+    </td>
+  </tr>
+</table>
+
+<h3>Fitur Real-Time Dashboard</h3>
+<ul>
+  <li><strong>Auto-refresh statistik</strong> — Polling API setiap 10 detik untuk update angka statistik</li>
+  <li><strong>Toast notification</strong> — Popup notifikasi saat ada kartu baru yang di-tap (polling setiap 2 detik)</li>
+  <li><strong>Sound effect</strong> — Web Audio API untuk suara notifikasi sukses/gagal</li>
+  <li><strong>Badge sesi berwarna</strong> — Kuning (Pagi), Biru (Siang), Orange (Sore), Ungu (Malam)</li>
+</ul>
+
+<!-- ==================== BAB 10 ==================== -->
+<div class="page-break"></div>
+<h1><span class="section-num">10</span> Logika Sesi Absensi</h1>
+
+<p>Sistem menentukan sesi absensi secara otomatis berdasarkan jam saat tap kartu. Logika sesi berjalan baik di ESP32 (via NTP) maupun di server PHP:</p>
+
+<table>
+  <tr>
+    <th>Sesi</th>
+    <th>Rentang Waktu</th>
+    <th>Greeting LCD</th>
+    <th>Badge Warna</th>
+  </tr>
+  <tr>
+    <td>🌅 <strong>Pagi</strong></td>
+    <td>06:00 – 11:59</td>
+    <td>"Selamat Pagi!"</td>
+    <td style="color: #eab308;">● Kuning</td>
+  </tr>
+  <tr>
+    <td>☀️ <strong>Siang</strong></td>
+    <td>12:00 – 14:59</td>
+    <td>"Selamat Siang!"</td>
+    <td style="color: #3b82f6;">● Biru</td>
+  </tr>
+  <tr>
+    <td>🌇 <strong>Sore</strong></td>
+    <td>15:00 – 17:59</td>
+    <td>"Selamat Sore!"</td>
+    <td style="color: #f97316;">● Orange</td>
+  </tr>
+  <tr>
+    <td>🌙 <strong>Malam</strong></td>
+    <td>18:00 – 05:59</td>
+    <td>"Selamat Malam!"</td>
+    <td style="color: #a855f7;">● Ungu</td>
+  </tr>
+</table>
+
+<h3>Kode Logika Sesi (ESP32 & PHP)</h3>
+<pre>
+// ESP32 (C++) — Sinkronisasi NTP UTC+8
+String getSesi(int hour) {
+  if (hour >= 6  && hour < 12) return "Pagi";
+  if (hour >= 12 && hour < 15) return "Siang";
+  if (hour >= 15 && hour < 18) return "Sore";
+  return "Malam";
+}
+
+// PHP — Timezone Asia/Makassar (WITA UTC+8)
+$hour = (int) date('G');
+if ($hour >= 6  && $hour < 12) $sesi = 'Pagi';
+elseif ($hour >= 12 && $hour < 15) $sesi = 'Siang';
+elseif ($hour >= 15 && $hour < 18) $sesi = 'Sore';
+else $sesi = 'Malam';
+</pre>
+
+<!-- ==================== BAB 11 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">11</span> Struktur File Project</h1>
+
+<pre>
+NodeMCU_RC522_Mysql/
+├── arduino/
+│   └── NodeMCU_V3_RFID_RC522_DB.ino   ← Firmware ESP32 (Sensor Node)
+│
+├── database.php                        ← Koneksi PDO ke MySQL (Cloud DB)
+├── getUID.php                          ← API endpoint: terima UID dari ESP32 (Sink Node)
+├── insertDB.php                        ← Helper insert database
+├── UIDContainer.php                    ← Temporary UID storage
+│
+├── home.php                            ← Dashboard utama (statistik + kontrol)
+├── registration.php                    ← Form registrasi pengguna RFID
+├── read tag.php                        ← Log absensi &amp; riwayat tap
+├── user data.php                       ← Manajemen data pengguna
+├── user data edit page.php             ← Edit data pengguna
+├── user data delete page.php           ← Hapus data pengguna
+│
+├── api_last_tap.php                    ← API: data tap terakhir (real-time notifikasi)
+├── api_stats.php                       ← API: statistik absensi hari ini
+├── read_tag_realtime.php               ← Polling data tag real-time
+├── log_absensi.php                     ← Log absensi query
+├── check_sleep.php                     ← Cek status sleep mode ESP32
+│
+├── style.css                           ← Stylesheet global
+├── jquery-3.7.1.min.js                 ← jQuery library
+├── css/                                ← Folder CSS tambahan
+├── js/                                 ← Folder JavaScript tambahan
+└── img/                                ← Folder gambar/aset
+</pre>
+
+<!-- ==================== BAB 12 ==================== -->
+<h1 style="margin-top: 30px;"><span class="section-num">12</span> Kesimpulan</h1>
+
+<p>
+Sistem Absensi Otomatis Berbasis IoT ini berhasil mengintegrasikan beberapa komponen utama dalam konsep <strong>Wireless Sensor Network (WSN)</strong>:
+</p>
+
+<ul>
+  <li><strong>ESP32</strong> sebagai <em>Sensor Node</em> yang membaca data RFID dan mengirimkannya secara wireless</li>
+  <li><strong>PHP Backend</strong> sebagai <em>Sink Node / Gateway</em> yang menerima dan memproses data dari sensor node</li>
+  <li><strong>MySQL Database</strong> sebagai <em>Cloud Database</em> untuk penyimpanan data absensi</li>
+  <li><strong>Web Dashboard</strong> sebagai <em>Application Layer</em> untuk monitoring dan manajemen sistem</li>
+</ul>
+
+<p>
+Dengan arsitektur 3 layer IoT (Perception, Network, Application), sistem ini menyediakan solusi absensi yang <strong>otomatis</strong>, <strong>real-time</strong>, <strong>efisien</strong>, dan <strong>user-friendly</strong> dengan feedback visual (LCD) dan audio (Buzzer) yang interaktif.
+</p>
+
+<div class="success-box">
+  <strong>✅ Keunggulan Sistem:</strong>
+  <ul style="margin-top: 6px;">
+    <li>Tidak bisa dipalsukan — UID RFID unik dan sulit diduplikasi</li>
+    <li>Real-time monitoring — Dashboard update otomatis setiap beberapa detik</li>
+    <li>Sesi otomatis — Klasifikasi waktu absensi tanpa input manual</li>
+    <li>Feedback interaktif — LCD + Buzzer memberikan konfirmasi langsung</li>
+    <li>Low-cost — Menggunakan komponen yang mudah didapat dan terjangkau</li>
+  </ul>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="doc-footer">
+  Draft Project — Sistem Absensi Otomatis Berbasis IoT (ESP32 + RFID RC522 + MySQL)<br>
+  Dokumen ini di-generate pada 31 Maret 2026 • Wireless Sensor Network (WSN)
+</div>
+
+</body>
+</html>
